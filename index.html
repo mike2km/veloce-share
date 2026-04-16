@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>VeloceShare</title>
+
+<script src="https://cdn.jsdelivr.net/npm/simple-peer@9/simplepeer.min.js"></script>
+
+<style>
+
+*{box-sizing:border-box;}
+
+body{
+margin:0;
+font-family:system-ui;
+color:white;
+background:linear-gradient(135deg,#020617,#022c22,#020617);
+transition:.4s;
+}
+
+/* LIGHT MODE */
+body.light{
+background:#f1f5f9;
+color:#020617;
+}
+
+/* LOGIN */
+#loginPage{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+.loginBox{
+background:#0f172a;
+padding:35px;
+border-radius:14px;
+width:320px;
+text-align:center;
+box-shadow:0 0 25px rgba(34,197,94,0.2);
+}
+
+.logo{
+width:110px;
+margin-bottom:15px;
+filter:drop-shadow(0 0 10px #22c55e);
+}
+
+/* HEADER */
+header{
+text-align:center;
+padding:15px;
+position:relative;
+}
+
+/* NAV */
+.nav{
+display:flex;
+justify-content:center;
+gap:10px;
+margin-bottom:10px;
+}
+
+.nav button{
+width:auto;
+padding:8px 12px;
+transition:.25s;
+}
+
+.nav button:hover{
+background:#16a34a;
+transform:scale(1.05);
+}
+
+/* SETTINGS ICON */
+.settingsBtn{
+position:absolute;
+top:15px;
+right:15px;
+background:#22c55e;
+padding:10px;
+border-radius:50%;
+cursor:pointer;
+transition:.3s;
+}
+
+.settingsBtn:hover{
+transform:rotate(90deg) scale(1.1);
+box-shadow:0 0 10px #22c55e;
+}
+
+.settingsBtn:active{
+transform:rotate(180deg) scale(0.9);
+}
+
+/* CONTAINER */
+.container{
+max-width:900px;
+margin:auto;
+padding:20px;
+}
+
+/* CARD */
+.card{
+background:#0f172a;
+border-radius:14px;
+padding:20px;
+margin-top:20px;
+transition:.3s;
+}
+
+.card:hover{
+transform:translateY(-5px);
+box-shadow:0 10px 25px rgba(34,197,94,0.15);
+}
+
+/* BUTTONS */
+button{
+width:100%;
+padding:10px;
+margin-top:10px;
+border:none;
+border-radius:10px;
+background:linear-gradient(135deg,#22c55e,#16a34a);
+color:white;
+cursor:pointer;
+font-weight:bold;
+transition:all .2s ease;
+position:relative;
+overflow:hidden;
+}
+
+button:hover{
+transform:translateY(-2px) scale(1.02);
+box-shadow:0 6px 15px rgba(34,197,94,0.3);
+}
+
+button:active{
+transform:scale(0.96);
+}
+
+/* RIPPLE */
+button::after{
+content:"";
+position:absolute;
+width:100px;
+height:100px;
+background:rgba(255,255,255,0.3);
+border-radius:50%;
+transform:scale(0);
+opacity:0;
+pointer-events:none;
+}
+
+button:active::after{
+transform:scale(3);
+opacity:1;
+transition:0s;
+}
+
+/* INPUT */
+input, textarea{
+width:100%;
+padding:10px;
+margin-top:10px;
+border-radius:10px;
+border:none;
+background:#020617;
+color:white;
+}
+
+/* VIDEO */
+video{
+width:100%;
+margin-top:10px;
+border-radius:10px;
+background:black;
+}
+
+/* PRICING */
+.pricingGrid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+gap:15px;
+}
+
+.priceCard{
+background:#020617;
+padding:20px;
+border-radius:12px;
+text-align:center;
+}
+
+.price{
+font-size:24px;
+color:#22c55e;
+}
+
+/* RGB */
+.rgb-controls{
+display:flex;
+gap:10px;
+}
+
+.rgb-controls input{
+flex:1;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div id="loginPage">
+<div class="loginBox">
+
+<img src="veloce-logo.png" class="logo">
+
+<h2>Login</h2>
+
+<input id="codeInput" placeholder="Access Code">
+<button onclick="login()">Enter</button>
+
+<div id="loginError"></div>
+
+</div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none;">
+
+<header>
+<img src="veloce-logo.png" class="logo">
+
+<div class="nav">
+<button onclick="showPage('home')">Home</button>
+<button onclick="showPage('subscriptions')">Plans</button>
+</div>
+
+<div class="settingsBtn" onclick="showPage('settings')">⚙️</div>
+
+</header>
+
+<div class="container">
+
+<!-- HOME -->
+<div id="homePage">
+
+<div class="card">
+<h2>Start Sharing</h2>
+<button onclick="startStream()">Start Screen Share</button>
+</div>
+
+<div class="card">
+<h2>Connect Devices</h2>
+
+<button onclick="createPeer()">Create Room</button>
+<button onclick="joinPeer()">Join Room</button>
+
+<textarea id="signalData"></textarea>
+
+<button onclick="connectWithCode()">Connect</button>
+
+<div id="status">Waiting...</div>
+</div>
+
+<div class="card">
+<h2>Live Screen</h2>
+<video id="video" autoplay playsinline></video>
+</div>
+
+</div>
+
+<!-- PLANS -->
+<div id="subscriptionPage" style="display:none;">
+
+<div class="card">
+<h2>Plans</h2>
+
+<div class="pricingGrid">
+
+<div class="priceCard">
+<h3>Basic</h3>
+<div class="price">$5.99</div>
+<p>720p • 1 device</p>
+</div>
+
+<div class="priceCard">
+<h3>Pro</h3>
+<div class="price">$11.99</div>
+<p>1080p • 5 devices</p>
+</div>
+
+<div class="priceCard">
+<h3>Ultra</h3>
+<div class="price">$25.99</div>
+<p>4K • Unlimited</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- SETTINGS -->
+<div id="settingsPage" style="display:none;">
+
+<div class="card">
+<h2>Appearance</h2>
+
+<button onclick="toggleTheme()">Toggle Dark / Light</button>
+
+<h3>Custom RGB Background</h3>
+
+<div class="rgb-controls">
+<input type="number" id="r" placeholder="R">
+<input type="number" id="g" placeholder="G">
+<input type="number" id="b" placeholder="B">
+</div>
+
+<button onclick="setRGB()">Apply</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+/* LOGIN */
+function login(){
+if(codeInput.value==="1111"){
+loginPage.style.display="none";
+app.style.display="block";
+}else{
+loginError.innerText="Wrong code";
+}
+}
+
+/* NAV */
+function showPage(page){
+homePage.style.display="none";
+subscriptionPage.style.display="none";
+settingsPage.style.display="none";
+
+if(page==="home") homePage.style.display="block";
+if(page==="subscriptions") subscriptionPage.style.display="block";
+if(page==="settings") settingsPage.style.display="block";
+}
+
+/* THEME */
+function toggleTheme(){
+document.body.classList.toggle("light");
+}
+
+/* RGB */
+function setRGB(){
+document.body.style.background=`rgb(${r.value||0},${g.value||0},${b.value||0})`;
+}
+
+/* STREAM */
+let stream;
+
+async function startStream(){
+stream = await navigator.mediaDevices.getDisplayMedia({video:true});
+video.srcObject = stream;
+status.innerText="Streaming...";
+}
+
+/* PEER */
+let peer;
+
+function createPeer(){
+if(!stream){
+alert("Start stream first");
+return;
+}
+
+peer = new SimplePeer({
+initiator:true,
+trickle:false,
+stream:stream
+});
+
+peer.on("signal", data=>{
+signalData.value = JSON.stringify(data);
+status.innerText="Send code";
+});
+
+peer.on("stream", remote=>{
+video.srcObject = remote;
+});
+}
+
+function joinPeer(){
+peer = new SimplePeer({
+initiator:false,
+trickle:false
+});
+
+peer.on("signal", data=>{
+signalData.value = JSON.stringify(data);
+status.innerText="Send back";
+});
+
+peer.on("stream", remote=>{
+video.srcObject = remote;
+});
+}
+
+function connectWithCode(){
+let input = prompt("Paste code");
+if(!input) return;
+
+peer.signal(JSON.parse(input));
+status.innerText="Connecting...";
+}
+
+</script>
+
+</body>
+</html>
