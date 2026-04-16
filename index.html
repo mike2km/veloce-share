@@ -1,168 +1,70 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>VeloceShare</title>
 
 <script src="https://cdn.jsdelivr.net/npm/simple-peer@9/simplepeer.min.js"></script>
 
 <style>
-
 *{box-sizing:border-box;}
 
 body{
 margin:0;
 font-family:system-ui;
+background:#020617;
 color:white;
-background:linear-gradient(135deg,#020617,#022c22,#020617);
-transition:.4s;
 }
 
-/* LIGHT MODE */
 body.light{
 background:#f1f5f9;
 color:#020617;
 }
 
-/* LOGIN */
-#loginPage{
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-}
-
-.loginBox{
-background:#0f172a;
-padding:35px;
-border-radius:14px;
-width:320px;
-text-align:center;
-box-shadow:0 0 25px rgba(34,197,94,0.2);
-}
-
-.logo{
-width:110px;
-margin-bottom:15px;
-filter:drop-shadow(0 0 10px #22c55e);
-}
-
-/* HEADER */
-header{
-text-align:center;
-padding:15px;
-position:relative;
-}
-
-/* NAV */
-.nav{
-display:flex;
-justify-content:center;
-gap:10px;
-margin-bottom:10px;
-}
-
-.nav button{
-width:auto;
-padding:8px 12px;
-transition:.25s;
-}
-
-.nav button:hover{
-background:#16a34a;
-transform:scale(1.05);
-}
-
-/* SETTINGS ICON */
-.settingsBtn{
-position:absolute;
-top:15px;
-right:15px;
-background:#22c55e;
-padding:10px;
-border-radius:50%;
-cursor:pointer;
-transition:.3s;
-}
-
-.settingsBtn:hover{
-transform:rotate(90deg) scale(1.1);
-box-shadow:0 0 10px #22c55e;
-}
-
-.settingsBtn:active{
-transform:rotate(180deg) scale(0.9);
-}
-
-/* CONTAINER */
 .container{
 max-width:900px;
 margin:auto;
 padding:20px;
 }
 
-/* CARD */
 .card{
 background:#0f172a;
-border-radius:14px;
 padding:20px;
+border-radius:16px;
 margin-top:20px;
-transition:.3s;
+box-shadow:0 10px 25px rgba(0,0,0,0.3);
 }
 
-.card:hover{
-transform:translateY(-5px);
-box-shadow:0 10px 25px rgba(34,197,94,0.15);
+h2{margin-top:0;}
+
+.logo{
+width:110px;
+display:block;
+margin:auto;
+margin-bottom:10px;
 }
 
-/* BUTTONS */
+/* buttons */
 button{
 width:100%;
-padding:10px;
+padding:12px;
 margin-top:10px;
 border:none;
-border-radius:10px;
-background:linear-gradient(135deg,#22c55e,#16a34a);
+border-radius:12px;
+background:#22c55e;
 color:white;
-cursor:pointer;
 font-weight:bold;
-transition:all .2s ease;
-position:relative;
-overflow:hidden;
+cursor:pointer;
 }
 
 button:hover{
-transform:translateY(-2px) scale(1.02);
-box-shadow:0 6px 15px rgba(34,197,94,0.3);
+background:#16a34a;
 }
 
-button:active{
-transform:scale(0.96);
-}
-
-/* RIPPLE */
-button::after{
-content:"";
-position:absolute;
-width:100px;
-height:100px;
-background:rgba(255,255,255,0.3);
-border-radius:50%;
-transform:scale(0);
-opacity:0;
-pointer-events:none;
-}
-
-button:active::after{
-transform:scale(3);
-opacity:1;
-transition:0s;
-}
-
-/* INPUT */
-input, textarea{
+/* inputs */
+textarea,input,select{
 width:100%;
 padding:10px;
 margin-top:10px;
@@ -172,98 +74,142 @@ background:#020617;
 color:white;
 }
 
-/* VIDEO */
+/* layout */
+.row{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:15px;
+}
+
+@media(max-width:700px){
+.row{grid-template-columns:1fr;}
+}
+
+/* video */
 video{
 width:100%;
+border-radius:12px;
 margin-top:10px;
-border-radius:10px;
 background:black;
 }
 
-/* PRICING */
+/* chat */
+#chatBox{
+height:150px;
+overflow:auto;
+background:#020617;
+padding:10px;
+border-radius:10px;
+}
+
+/* nav */
+.nav{
+display:flex;
+gap:10px;
+margin-top:10px;
+}
+
+/* plans */
 .pricingGrid{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
 gap:15px;
 }
-
 .priceCard{
 background:#020617;
 padding:20px;
 border-radius:12px;
 text-align:center;
 }
-
-.price{
-font-size:24px;
-color:#22c55e;
-}
-
-/* RGB */
-.rgb-controls{
-display:flex;
-gap:10px;
-}
-
-.rgb-controls input{
-flex:1;
-}
-
+.price{color:#22c55e;font-size:24px;}
 </style>
+
 </head>
 
 <body>
 
 <!-- LOGIN -->
-<div id="loginPage">
-<div class="loginBox">
 
+<div id="loginPage" class="container">
+<div class="card">
 <img src="veloce-logo.png" class="logo">
-
 <h2>Login</h2>
-
 <input id="codeInput" placeholder="Access Code">
 <button onclick="login()">Enter</button>
-
 <div id="loginError"></div>
-
 </div>
 </div>
 
 <!-- APP -->
-<div id="app" style="display:none;">
 
-<header>
+<div id="app" style="display:none;" class="container">
+
 <img src="veloce-logo.png" class="logo">
 
 <div class="nav">
 <button onclick="showPage('home')">Home</button>
-<button onclick="showPage('subscriptions')">Plans</button>
+<button onclick="showPage('plans')">Plans</button>
+<button onclick="showPage('settings')">Settings</button>
 </div>
 
-<div class="settingsBtn" onclick="showPage('settings')">⚙️</div>
-
-</header>
-
-<div class="container">
-
 <!-- HOME -->
+
 <div id="homePage">
 
 <div class="card">
-<h2>Start Sharing</h2>
-<button onclick="startStream()">Start Screen Share</button>
+<h2>Stream Controls</h2>
+
+<select id="qualitySelect">
+<option value="low">Low (480p)</option>
+<option value="medium">Medium (720p)</option>
+<option value="high">High (1080p)</option>
+</select>
+
+<button onclick="startStream()">Start Screen Share</button> <button onclick="goFullscreen()">Fullscreen</button>
+
 </div>
 
 <div class="card">
-<h2>Connect Devices</h2>
+<h2>Room Connection</h2>
 
-<button onclick="createPeer()">Create Room</button>
-<button onclick="joinPeer()">Join Room</button>
+<div class="row">
 
-<textarea id="signalData"></textarea>
+<!-- HOST -->
 
-<button onclick="connectWithCode()">Connect</button>
+<div>
+<h3>Host</h3>
+<button onclick="createRoom()">Create Room</button>
+
+<label>Host Code (send to user)</label>
+
+<textarea id="hostCodeBox"></textarea>
+
+<label>Paste User Code</label>
+
+<textarea id="userCodeBox"></textarea>
+
+<button onclick="connectUser()">Connect User</button>
+
+</div>
+
+<!-- JOIN -->
+
+<div>
+<h3>Join</h3>
+
+<label>Paste Host Code</label>
+
+<textarea id="joinCodeBox"></textarea>
+
+<button onclick="joinRoom()">Join Room</button>
+
+<label>Your Response Code</label>
+
+<textarea id="responseCodeBox"></textarea>
+
+</div>
+
+</div>
 
 <div id="status">Waiting...</div>
 </div>
@@ -273,62 +219,45 @@ flex:1;
 <video id="video" autoplay playsinline></video>
 </div>
 
+<div class="card">
+<h2>Chat</h2>
+<div id="chatBox"></div>
+<input id="chatInput" placeholder="Type message">
+<button onclick="sendMessage()">Send</button>
+</div>
+
 </div>
 
 <!-- PLANS -->
-<div id="subscriptionPage" style="display:none;">
 
+<div id="plansPage" style="display:none;">
 <div class="card">
 <h2>Plans</h2>
-
 <div class="pricingGrid">
-
-<div class="priceCard">
-<h3>Basic</h3>
-<div class="price">$5.99</div>
-<p>720p • 1 device</p>
+<div class="priceCard"><h3>Basic</h3><div class="price">$5.99</div></div>
+<div class="priceCard"><h3>Pro</h3><div class="price">$11.99</div></div>
+<div class="priceCard"><h3>Ultra</h3><div class="price">$25.99</div></div>
 </div>
-
-<div class="priceCard">
-<h3>Pro</h3>
-<div class="price">$11.99</div>
-<p>1080p • 5 devices</p>
 </div>
-
-<div class="priceCard">
-<h3>Ultra</h3>
-<div class="price">$25.99</div>
-<p>4K • Unlimited</p>
-</div>
-
-</div>
-
-</div>
-
 </div>
 
 <!-- SETTINGS -->
+
 <div id="settingsPage" style="display:none;">
-
 <div class="card">
-<h2>Appearance</h2>
+<h2>Settings</h2>
 
-<button onclick="toggleTheme()">Toggle Dark / Light</button>
+<button onclick="toggleTheme()">Toggle Theme</button>
 
-<h3>Custom RGB Background</h3>
-
-<div class="rgb-controls">
-<input type="number" id="r" placeholder="R">
-<input type="number" id="g" placeholder="G">
-<input type="number" id="b" placeholder="B">
+<h3>RGB Background</h3>
+<div class="row">
+<input id="r" placeholder="R">
+<input id="g" placeholder="G">
+<input id="b" placeholder="B">
 </div>
-
 <button onclick="setRGB()">Apply</button>
 
 </div>
-
-</div>
-
 </div>
 
 </div>
@@ -346,82 +275,137 @@ loginError.innerText="Wrong code";
 }
 
 /* NAV */
-function showPage(page){
+function showPage(p){
 homePage.style.display="none";
-subscriptionPage.style.display="none";
+plansPage.style.display="none";
 settingsPage.style.display="none";
 
-if(page==="home") homePage.style.display="block";
-if(page==="subscriptions") subscriptionPage.style.display="block";
-if(page==="settings") settingsPage.style.display="block";
-}
-
-/* THEME */
-function toggleTheme(){
-document.body.classList.toggle("light");
-}
-
-/* RGB */
-function setRGB(){
-document.body.style.background=`rgb(${r.value||0},${g.value||0},${b.value||0})`;
+if(p==="home") homePage.style.display="block";
+if(p==="plans") plansPage.style.display="block";
+if(p==="settings") settingsPage.style.display="block";
 }
 
 /* STREAM */
 let stream;
-
 async function startStream(){
-stream = await navigator.mediaDevices.getDisplayMedia({video:true});
-video.srcObject = stream;
-status.innerText="Streaming...";
+let q=qualitySelect.value;
+
+let constraints={
+video:{
+width:q==="low"?640:q==="medium"?1280:1920,
+height:q==="low"?480:q==="medium"?720:1080,
+frameRate:q==="low"?15:30
+}
+};
+
+stream=await navigator.mediaDevices.getDisplayMedia(constraints);
+video.srcObject=stream;
+status.innerText="Streaming ("+q+")";
 }
 
-/* PEER */
-let peer;
-
-function createPeer(){
-if(!stream){
-alert("Start stream first");
-return;
+/* FULLSCREEN */
+function goFullscreen(){
+video.requestFullscreen();
 }
 
-peer = new SimplePeer({
+/* WEBRTC */
+let peers=[];
+let peer=null;
+
+function createRoom(){
+const p=new SimplePeer({
 initiator:true,
 trickle:false,
-stream:stream
+stream:stream,
+config:{iceServers:[
+{urls:"stun:stun.l.google.com:19302"},
+{urls:"stun:global.stun.twilio.com:3478"}
+]}
 });
 
-peer.on("signal", data=>{
-signalData.value = JSON.stringify(data);
-status.innerText="Send code";
+p.on("signal",d=>{
+hostCodeBox.value="$"+btoa(JSON.stringify(d));
 });
 
-peer.on("stream", remote=>{
-video.srcObject = remote;
+p.on("data",d=>{
+addMessage("User: "+d);
+peers.forEach(x=>{if(x!==p)x.send(d);});
 });
+
+p.on("stream",r=>{
+video.srcObject=r;
+});
+
+peers.push(p);
 }
 
-function joinPeer(){
-peer = new SimplePeer({
+function connectUser(){
+let input=userCodeBox.value.trim();
+if(input.startsWith("$")) input=input.slice(1);
+
+const signal=JSON.parse(atob(input));
+peers[peers.length-1].signal(signal);
+
+createRoom();
+}
+
+function joinRoom(){
+let input=joinCodeBox.value.trim();
+if(input.startsWith("$")) input=input.slice(1);
+
+const signal=JSON.parse(atob(input));
+
+peer=new SimplePeer({
 initiator:false,
-trickle:false
+trickle:false,
+config:{iceServers:[
+{urls:"stun:stun.l.google.com:19302"},
+{urls:"stun:global.stun.twilio.com:3478"}
+]}
 });
 
-peer.on("signal", data=>{
-signalData.value = JSON.stringify(data);
-status.innerText="Send back";
+peer.signal(signal);
+
+peer.on("signal",d=>{
+responseCodeBox.value="$"+btoa(JSON.stringify(d));
 });
 
-peer.on("stream", remote=>{
-video.srcObject = remote;
+peer.on("data",d=>{
+addMessage(d);
+});
+
+peer.on("stream",r=>{
+video.srcObject=r;
 });
 }
 
-function connectWithCode(){
-let input = prompt("Paste code");
-if(!input) return;
+/* CHAT */
+function sendMessage(){
+const msg=chatInput.value;
+if(!msg) return;
 
-peer.signal(JSON.parse(input));
-status.innerText="Connecting...";
+addMessage("You: "+msg);
+
+if(peer) peer.send(msg);
+peers.forEach(p=>p.send(msg));
+
+chatInput.value="";
+}
+
+function addMessage(msg){
+const div=document.createElement("div");
+div.textContent=msg;
+chatBox.appendChild(div);
+chatBox.scrollTop=chatBox.scrollHeight;
+}
+
+/* SETTINGS */
+function toggleTheme(){
+document.body.classList.toggle("light");
+}
+
+function setRGB(){
+document.body.style.background=`rgb(${r.value||0},${g.value||0},${b.value||0})`;
 }
 
 </script>
